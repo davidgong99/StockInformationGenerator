@@ -55,6 +55,36 @@ class GoogleSheets():
     #             # Print columns A and E, which correspond to indices 0 and 4.
     #             print('%s, %s' % (row[0], row[4]))
 
+    def readRange(self, spreadsheetID='', rangeName=''):
+        if not spreadsheetID:
+            spreadsheetID = self.config["spreadsheetID"]
+        if not rangeName:
+            rangeName = self.config["spreadsheetRange"]
+        print(rangeName)
+        # How values should be represented in the output.
+        # The default render option is ValueRenderOption.FORMATTED_VALUE.
+        # value_render_option = 'FORMATTED_VALUE'  # TODO: Update placeholder value.
+        
+        # How dates, times, and durations should be represented in the output.
+        # This is ignored if value_render_option is
+        # FORMATTED_VALUE.
+        # The default dateTime render option is [DateTimeRenderOption.SERIAL_NUMBER].
+        # date_time_render_option = 'FORMATTED_STRING'  # TODO: Update placeholder value.
+        result = self.sheet.values().get(spreadsheetId=spreadsheetID,
+                                range=rangeName).execute()
+        # print(result)
+        values = result.get('values', [])
+        
+        if not values:
+            print('No data found.')
+        else:
+            print('Name, Major:')
+            for row in values:
+                # Print columns A and E, which correspond to indices 0 and 4.
+                # print('%s, %s' % (row[0], row[4]))
+                print(row)
+                
+        return values
 
     # This function will write inputted transaction into Google Sheets
     '''
