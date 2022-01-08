@@ -71,6 +71,8 @@ class YahooFinance():
             spreadsheetData[ticker] = tickerData
         
         return spreadsheetData
+        
+    # def getTicker
             
             
     def _getColumns(self):
