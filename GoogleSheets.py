@@ -85,6 +85,24 @@ class GoogleSheets():
                 print(row)
                 
         return values
+        
+    def writeStockInfo(self, stockInfo, rowNumber, spreadsheetID=''):
+        if not spreadsheetID:
+            spreadsheetID = self.config["spreadsheetID"]
+        # if not rangeName:
+        #     rangeName = self.config["spreadsheetRange"]
+        # Send data to be written
+        body = {
+            'values': [stockInfo]
+        }
+        
+        rangeName = f"B{rowNumber}"
+
+        value_input_option = "USER_ENTERED" # ["RAW","USER_ENTERED"]
+        result = self.sheet.values().update(
+            spreadsheetId=spreadsheetID, range=rangeName,
+            valueInputOption=value_input_option, body=body).execute()
+        print('{0} cells updated.'.format(result.get('updatedCells')))
 
     # This function will write inputted transaction into Google Sheets
     '''
