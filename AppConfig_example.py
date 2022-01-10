@@ -8,5 +8,14 @@ def init():
         # This is the name of the sheet you want to update
         # Note: This script will OVERRIDE whatever is in that range
         # You can also specify a range like this: "MySheet!A3:M8"
-        "spreadsheetRange": "Sheet1"
+        "spreadsheetRange": "Sheet1",
+        
+        # Column names
+        "dataColumns": ["shortName","sector","marketCap","enterpriseToEbitda","lastDividendValue","trailingAnnualDividendYield","fiveYearAvgDividendYield","trailingAnnualDividendRate","lastDividendDate","exDividendDate","payoutRatio","lastSplitFactor","lastSplitDate","recommendationKey"],
+        
+        # Number of total rows of tickers to search for
+        "tickerCount": 30,
+        
+        # Number of threads to create at once
+        "threadLimit": 5,
     }

@@ -15,8 +15,40 @@ class StockInformation():
     def generateStockInfoMultithread(self):
     
         tickerCount = self.config["tickerCount"]
+        threadLimit = self.config["threadLimit"]
+        
+        nextRow = 1 # tracks which rows we should process next
     
-    
+        while nextRow <= tickerCount: # Iterate until tickerCount row is processed
+            # Retrieve list of tickers
+            tickersList = self.gs.readRange(rangeName=f"A{nextRow}:A{nextRow + threadLimit - 1}")
+            
+            threads = list()
+            # rowCounter = 1
+            
+            # create new thread for each ticker
+            for tickerArr in tickersList:
+                ticker = tickerArr[0] # Extract ticker from list of form ['CBA.AX']
+                try:
+                    # Create thread
+                    yahooThread = threading.Thread(target=self.writeStockInfoThread, kwargs={'ticker': ticker, 'rowNum': nextRow})
+                    threads.append(yahooThread)
+                    yahooThread.start()
+                except Exception as e:
+                    print(e)
+                    
+                
+                # Increment row counter
+                nextRow += 1
+            
+            # Wait forall threads to finish, then close them
+            for thread in threads:
+                thread.join()
+            # return
+        
+        return
+        
+        '''
         # Retrieve list of tickers
         tickersList = self.gs.readRange(rangeName=f"A1:A{tickerCount}")
         
@@ -43,7 +75,7 @@ class StockInformation():
             thread.join()
         return
         
-    
+        '''
     def writeStockInfoThread(self, ticker, rowNum, retryAttempt=0):
         print(f"Thread started: writeInfo({ticker}, {rowNum})")
         
