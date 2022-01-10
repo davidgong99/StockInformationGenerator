@@ -72,11 +72,6 @@ class YahooFinance():
         
         return spreadsheetData
         
-    # def getTicker
-            
-            
-    def _getColumns(self):
-        return ["sector","revenueGrowth","recommendationKey"]
             
         
         
