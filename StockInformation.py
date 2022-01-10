@@ -10,10 +10,15 @@ class StockInformation():
         self.x = 1
         self.gs = GoogleSheets()
         self.yf = YahooFinance()
+        self.config = AppConfig.config
         
     def generateStockInfoMultithread(self):
+    
+        tickerCount = self.config["tickerCount"]
+    
+    
         # Retrieve list of tickers
-        tickersList = self.gs.readRange(rangeName="A1:A5")
+        tickersList = self.gs.readRange(rangeName=f"A1:A{tickerCount}")
         
         threads = list()
         rowCounter = 1
@@ -39,29 +44,42 @@ class StockInformation():
         return
         
     
-    def writeStockInfoThread(self, ticker, rowNum):
+    def writeStockInfoThread(self, ticker, rowNum, retryAttempt=0):
         print(f"Thread started: writeInfo({ticker}, {rowNum})")
         
-        if ticker == "Ticker":
-            self.gs.writeStockInfo(self.getColumns(), rowNum)
-            return 1
-        
-        # Retrieve all data from Yahoo Finance
-        tickerData = self.yf.getTickerData(ticker)
-        
-        # Extract relevant information
-        rowData = []
-        for columnName in self.getColumns():
-            try:
-                rowData.append(tickerData.info[columnName])
-            except Exception as e:
-                print(e)
-                rowData.append("")
-                
-        # Write to spreadsheet
-        self.gs.writeStockInfo(rowData, rowNum)
+        try:
+
+            if ticker == "Ticker":
+                self.gs.writeStockInfo(self.getColumns(), rowNum)
+                return 1
+            
+            # Retrieve all data from Yahoo Finance
+            tickerData = self.yf.getTickerData(ticker)
+            
+            # Extract relevant information
+            rowData = []
+            for columnName in self.getColumns():
+                try:
+                    rowData.append(tickerData.info[columnName])
+                except Exception as e:
+                    print(e)
+                    rowData.append("")
+                    
+            # Write to spreadsheet
+            self.gs.writeStockInfo(rowData, rowNum)
+        except Exception as e:
+            print(e)
+            
+            if retryAttempt < 3:
+            
+                print(f"Retrying: writeInfo({ticker}, {rowNum})")
+                return self.writeStockInfoThread(ticker, rowNum, retryAttempt + 1)
+            else:
+                print(f"Thread failed (0): writeInfo({ticker}, {rowNum})")
+                return 0
+            
         print(f"Thread ended (1): writeInfo({ticker}, {rowNum})")
         return 1
         
     def getColumns(self):
-        return AppConfig.config["dataColumns"]
+        return self.config["dataColumns"]
