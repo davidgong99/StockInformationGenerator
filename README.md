@@ -7,3 +7,10 @@ Input format
 
 Output
 * Populated columns for each piece of information from Yahoo Finance's statistics page
+
+# TODO
+
+1. Update multithreading workflow - 
+    * Threads should be used to READ from yahoofinance, and append the data to an external list
+    * After the threads finish excuting, there should be a batch update to google sheets
+    * Current workflow: Each thread READS from yahoofinance and WRITES to google sheets individually -> seg fault
