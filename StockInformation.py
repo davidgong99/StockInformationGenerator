@@ -14,10 +14,11 @@ class StockInformation():
         
     def generateStockInfoMultithread(self):
     
-        tickerCount = self.config["tickerCount"]
+        nextRow = self.config["startRow"] # tracks which rows we should process next
+        
+        tickerCount = nextRow + self.config["tickerCount"]
         threadLimit = self.config["threadLimit"]
         
-        nextRow = 1 # tracks which rows we should process next
     
         while nextRow <= tickerCount: # Iterate until tickerCount row is processed
             # Retrieve list of tickers

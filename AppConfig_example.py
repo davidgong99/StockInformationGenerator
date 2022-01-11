@@ -13,6 +13,9 @@ def init():
         # Column names
         "dataColumns": ["shortName","sector","marketCap","enterpriseToEbitda","lastDividendValue","trailingAnnualDividendYield","fiveYearAvgDividendYield","trailingAnnualDividendRate","lastDividendDate","exDividendDate","payoutRatio","lastSplitFactor","lastSplitDate","recommendationKey"],
         
+        # Starting row to process from
+        "startRow": 101,
+        
         # Number of total rows of tickers to search for
         "tickerCount": 30,
         
