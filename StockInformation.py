@@ -35,6 +35,7 @@ class StockInformation():
                     threads.append(yahooThread)
                     yahooThread.start()
                 except Exception as e:
+                    print("Exception in gnerateStockInfoMultithread()")
                     print(e)
                     
                 
@@ -94,13 +95,16 @@ class StockInformation():
                 try:
                     rowData.append(tickerData.info[columnName])
                 except Exception as e:
+                    print("Exception getting column name")
                     print(e)
                     rowData.append("")
                     
             # Write to spreadsheet
             self.gs.writeStockInfo(rowData, rowNum)
         except Exception as e:
+            print(f"Exception in writeStockInfoThread({ticker},{rowNum},{retryAttempt})")
             print(e)
+            
             
             if retryAttempt < 3:
             
