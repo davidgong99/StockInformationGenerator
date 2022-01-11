@@ -68,42 +68,20 @@ class StockInformation():
             self.gs.writeStockInfo(stockDataList, nextRow - threadLimit)
         return
         
-        '''
-        # Retrieve list of tickers
-        tickersList = self.gs.readRange(rangeName=f"A1:A{tickerCount}")
-        
-        threads = list()
-        rowCounter = 1
-        
-        # create new thread for each ticker
-        for tickerArr in tickersList:
-            ticker = tickerArr[0] # Extract ticker from list of form ['CBA.AX']
-            try:
-                # Create thread
-                yahooThread = threading.Thread(target=self.writeStockInfoThread, kwargs={'ticker': ticker, 'rowNum': rowCounter})
-                threads.append(yahooThread)
-                yahooThread.start()
-            except Exception as e:
-                print(e)
-                
-            
-            # Increment row counter
-            rowCounter += 1
-        
-        # Wait forall threads to finish, then close them
-        for thread in threads:
-            thread.join()
-        return
-        
-        '''
-        
     '''
     This function will retrieve all the stock info from YahooFinance, and append it to an external list
     
     Input
-    
+        ticker::string - YahooFinance formatted ticker
+        rowNum::integer - To track the current row number
+        dataBuffer::dictionary - For outputting stock data from thread
+        retryAttempt::integer - To track retry attempt number
     Output
-    
+        None::None
+    Impact
+        Updates dataBuffer::dictionary with the stock data for the current ticker
+            Key: rowNum::integer
+            Value: rowData::list
     '''
     def appendYahooDataThread(self, ticker, rowNum, dataBuffer, retryAttempt=0):
         print(f"    Thread started: writeInfo({ticker}, {rowNum}, {retryAttempt})")
@@ -145,7 +123,7 @@ class StockInformation():
             if retryAttempt < 3:
             
                 print(f"Retrying: writeInfo({ticker}, {rowNum})")
-                return self.writeStockInfoThread(ticker, rowNum, retryAttempt + 1)
+                return self.appendYahooDataThread(ticker, rowNum, retryAttempt + 1)
             else:
                 print(f"Thread failed (0): writeInfo({ticker}, {rowNum})")
                 return 0
