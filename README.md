@@ -14,3 +14,5 @@ Output
     * Threads should be used to READ from yahoofinance, and append the data to an external list
     * After the threads finish excuting, there should be a batch update to google sheets
     * Current workflow: Each thread READS from yahoofinance and WRITES to google sheets individually -> seg fault
+    * httplib used by googleapiclient is not thread-safe [source](https://googleapis.github.io/google-api-python-client/docs/thread_safety.html)
+2. Add option to start from certain row
