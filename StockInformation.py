@@ -26,12 +26,21 @@ class StockInformation():
             threads = list()
             # rowCounter = 1
             
+            # This buffer ditionary is used to keep row data in order by storing their index as a key
+            # The buffer dictionary will then be transformed into a list ordered by key 
+            #   to maintain the order of data after multithreading
+            # key: index::integer
+            # value: rowData::list
+            stockDataBuffer = {}
+            
             # create new thread for each ticker
             for tickerArr in tickersList:
                 ticker = tickerArr[0] # Extract ticker from list of form ['CBA.AX']
                 try:
                     # Create thread
-                    yahooThread = threading.Thread(target=self.writeStockInfoThread, kwargs={'ticker': ticker, 'rowNum': nextRow})
+                    
+                    print(f"Main    : create and start thread for {ticker}")
+                    yahooThread = threading.Thread(target=self.appendYahooDataThread, kwargs={'ticker': ticker, 'rowNum': nextRow, 'dataBuffer': stockDataBuffer})
                     threads.append(yahooThread)
                     yahooThread.start()
                 except Exception as e:
@@ -44,9 +53,18 @@ class StockInformation():
             
             # Wait forall threads to finish, then close them
             for thread in threads:
+                print(f"Main    : before joining thread for {ticker}")
                 thread.join()
+                print(f"Main    : thread for {ticker} done")
             # return
-        
+            
+            print(f"{stockDataBuffer}")
+            # Convery stockDataBuffer into a list
+            stockDataList = []
+            for i in range(nextRow - threadLimit, nextRow):
+                stockDataList.append(stockDataBuffer[i])
+            
+            self.gs.writeStockInfo(stockDataList, nextRow - threadLimit)
         return
         
         '''
@@ -77,30 +95,47 @@ class StockInformation():
         return
         
         '''
-    def writeStockInfoThread(self, ticker, rowNum, retryAttempt=0):
-        print(f"Thread started: writeInfo({ticker}, {rowNum})")
+        
+    '''
+    This function will retrieve all the stock info from YahooFinance, and append it to an external list
+    
+    Input
+    
+    Output
+    
+    '''
+    def appendYahooDataThread(self, ticker, rowNum, dataBuffer, retryAttempt=0):
+        print(f"    Thread started: writeInfo({ticker}, {rowNum}, {retryAttempt})")
         
         try:
 
             if ticker == "Ticker":
-                self.gs.writeStockInfo(self.getColumns(), rowNum)
+                # self.gs.writeStockInfo(self.getColumns(), rowNum)
+                dataBuffer[rowNum] = self.getColumns()
                 return 1
             
             # Retrieve all data from Yahoo Finance
             tickerData = self.yf.getTickerData(ticker)
+            print(f"     {ticker}: Ticker data retrieved")
             
             # Extract relevant information
             rowData = []
             for columnName in self.getColumns():
                 try:
-                    rowData.append(tickerData.info[columnName])
+                    # Check if exists or is None
+                    if columnName not in tickerData.info or not tickerData.info[columnName]:
+                        rowData.append("")
+                    else:
+                        rowData.append(tickerData.info[columnName])
                 except Exception as e:
                     print("Exception getting column name")
                     print(e)
                     rowData.append("")
                     
             # Write to spreadsheet
-            self.gs.writeStockInfo(rowData, rowNum)
+            # self.gs.writeStockInfo(rowData, rowNum)
+            dataBuffer[rowNum] = rowData
+            print(f"     {ticker}: Ticker data added to buffer")
         except Exception as e:
             print(f"Exception in writeStockInfoThread({ticker},{rowNum},{retryAttempt})")
             print(e)

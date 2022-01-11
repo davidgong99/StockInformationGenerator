@@ -86,19 +86,21 @@ class GoogleSheets():
                 
         return values
         
-    def writeStockInfo(self, stockInfo, rowNumber, spreadsheetID=''):
+    def writeStockInfo(self, stockInfo, startRow, spreadsheetID=''):
         if not spreadsheetID:
             spreadsheetID = self.config["spreadsheetID"]
         # if not rangeName:
         #     rangeName = self.config["spreadsheetRange"]
         # Send data to be written
         body = {
-            'values': [stockInfo]
+            'values': stockInfo
         }
         
-        rangeName = f"B{rowNumber}"
+        # rangeName = f"B{rowNumber}"
+        rangeName = f"Sheet1!B{startRow}:Z"
 
         value_input_option = "USER_ENTERED" # ["RAW","USER_ENTERED"]
+        print(f"About to writ data: {stockInfo}")
         result = self.sheet.values().update(
             spreadsheetId=spreadsheetID, range=rangeName,
             valueInputOption=value_input_option, body=body).execute()
