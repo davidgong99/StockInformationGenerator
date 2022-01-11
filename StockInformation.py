@@ -21,11 +21,13 @@ class StockInformation():
         
     
         while nextRow <= tickerCount: # Iterate until tickerCount row is processed
+            firstRowInBatch = nextRow
+            lastRowInBatch = min(nextRow + threadLimit - 1, tickerCount)
+            
             # Retrieve list of tickers
-            tickersList = self.gs.readRange(rangeName=f"A{nextRow}:A{nextRow + threadLimit - 1}")
+            tickersList = self.gs.readRange(rangeName=f"A{nextRow}:A{lastRowInBatch}")
             
             threads = list()
-            # rowCounter = 1
             
             # This buffer ditionary is used to keep row data in order by storing their index as a key
             # The buffer dictionary will then be transformed into a list ordered by key 
@@ -41,11 +43,14 @@ class StockInformation():
                     # Create thread
                     
                     print(f"Main    : create and start thread for {ticker}")
-                    yahooThread = threading.Thread(target=self.appendYahooDataThread, kwargs={'ticker': ticker, 'rowNum': nextRow, 'dataBuffer': stockDataBuffer})
+                    yahooThread = threading.Thread(
+                        target=self.appendYahooDataThread, 
+                        kwargs={'ticker': ticker, 'rowNum': nextRow, 'dataBuffer': stockDataBuffer}
+                    )
                     threads.append(yahooThread)
                     yahooThread.start()
                 except Exception as e:
-                    print("Exception in gnerateStockInfoMultithread()")
+                    print("Exception in generateStockInfoMultithread()")
                     print(e)
                     
                 
@@ -57,15 +62,18 @@ class StockInformation():
                 print(f"Main    : before joining thread for {ticker}")
                 thread.join()
                 print(f"Main    : thread for {ticker} done")
-            # return
             
-            print(f"{stockDataBuffer}")
             # Convery stockDataBuffer into a list
             stockDataList = []
-            for i in range(nextRow - threadLimit, nextRow):
-                stockDataList.append(stockDataBuffer[i])
             
-            self.gs.writeStockInfo(stockDataList, nextRow - threadLimit)
+            for i in range(firstRowInBatch, lastRowInBatch + 1):
+                try:
+                    stockDataList.append(stockDataBuffer[i])
+                except Exception as e:
+                    print("Exception extracting data from stockDataBuffer")
+                    print(e)
+            
+            self.gs.writeStockInfo(stockDataList, firstRowInBatch)
         return
         
     '''
@@ -89,8 +97,10 @@ class StockInformation():
         try:
 
             if ticker == "Ticker":
-                # self.gs.writeStockInfo(self.getColumns(), rowNum)
-                dataBuffer[rowNum] = self.getColumns()
+                headerRow = []
+                for column in self.getColumns():
+                    headerRow.append(column.niceName)
+                dataBuffer[rowNum] = headerRow
                 return 1
             
             # Retrieve all data from Yahoo Finance
@@ -99,13 +109,15 @@ class StockInformation():
             
             # Extract relevant information
             rowData = []
-            for columnName in self.getColumns():
+            for column in self.getColumns():
                 try:
                     # Check if exists or is None
-                    if columnName not in tickerData.info or not tickerData.info[columnName]:
+                    if column.keyName not in tickerData.info or not tickerData.info[column.keyName]:
                         rowData.append("")
                     else:
-                        rowData.append(tickerData.info[columnName])
+                        rowData.append(column.format(tickerData.info[column.keyName]))
+                        
+                        # rowData.append(tickerData.info[columnName])
                 except Exception as e:
                     print("Exception getting column name")
                     print(e)
