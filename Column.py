@@ -1,4 +1,6 @@
 from Millify import millify
+
+import datetime
 class Column:
     def __init__(self, keyName, niceName, formatType="string"):
         self.keyName = keyName 
@@ -11,6 +13,11 @@ class Column:
                 return f"{data}mmm"
             elif self.formatType == "millify":
                 return millify(data)
+            elif self.formatType == "epochToDate":
+                currDate = datetime.datetime.fromtimestamp(data)
+                
+                return currDate.strftime("%d/%m/%Y")
+                
             return data
             
         except Exception as e:

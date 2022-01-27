@@ -99,7 +99,7 @@ class GoogleSheets():
         # rangeName = f"B{rowNumber}"
         rangeName = f"Sheet1!B{startRow}:Z"
 
-        value_input_option = "USER_ENTERED" # ["RAW","USER_ENTERED"]
+        value_input_option = "RAW" # ["RAW","USER_ENTERED"]
         print(f"About to writ data: {stockInfo}")
         result = self.sheet.values().update(
             spreadsheetId=spreadsheetID, range=rangeName,
