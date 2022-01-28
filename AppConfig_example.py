@@ -8,7 +8,7 @@ def init():
         # This is the name of the sheet you want to update
         # Note: This script will OVERRIDE whatever is in that range
         # You can also specify a range like this: "MySheet!A3:M8"
-        "spreadsheetRange": "Sheet1",
+        "spreadsheetName": "Sheet1",
         
         # Column names
         "dataColumns": ["shortName","sector","marketCap","enterpriseToEbitda","lastDividendValue","trailingAnnualDividendYield","fiveYearAvgDividendYield","trailingAnnualDividendRate","lastDividendDate","exDividendDate","payoutRatio","lastSplitFactor","lastSplitDate","recommendationKey"],

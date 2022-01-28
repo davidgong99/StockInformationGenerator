@@ -55,12 +55,14 @@ class GoogleSheets():
     #             # Print columns A and E, which correspond to indices 0 and 4.
     #             print('%s, %s' % (row[0], row[4]))
 
-    def readRange(self, spreadsheetID='', rangeName=''):
+    # Note: spreadsheetRange is in the form of "!A1:B3"
+    def readRange(self, spreadsheetID='', spreadsheetName='', spreadsheetRange=''):
         if not spreadsheetID:
             spreadsheetID = self.config["spreadsheetID"]
-        if not rangeName:
-            rangeName = self.config["spreadsheetRange"]
-        print(rangeName)
+        if not spreadsheetName:
+            spreadsheetName = self.config["spreadsheetName"]
+        
+        readingRange = f"{spreadsheetName}{spreadsheetRange}"
         # How values should be represented in the output.
         # The default render option is ValueRenderOption.FORMATTED_VALUE.
         # value_render_option = 'FORMATTED_VALUE'  # TODO: Update placeholder value.
@@ -71,7 +73,7 @@ class GoogleSheets():
         # The default dateTime render option is [DateTimeRenderOption.SERIAL_NUMBER].
         # date_time_render_option = 'FORMATTED_STRING'  # TODO: Update placeholder value.
         result = self.sheet.values().get(spreadsheetId=spreadsheetID,
-                                range=rangeName).execute()
+                                range=readingRange).execute()
         # print(result)
         values = result.get('values', [])
         
@@ -86,18 +88,18 @@ class GoogleSheets():
                 
         return values
         
-    def writeStockInfo(self, stockInfo, startRow, spreadsheetID=''):
+    def writeStockInfo(self, stockInfo, startRow, spreadsheetID='', spreadsheetName=''):
         if not spreadsheetID:
             spreadsheetID = self.config["spreadsheetID"]
-        # if not rangeName:
-        #     rangeName = self.config["spreadsheetRange"]
+        if not spreadsheetName:
+            spreadsheetName = self.config["spreadsheetName"]
         # Send data to be written
         body = {
             'values': stockInfo
         }
         
         # rangeName = f"B{rowNumber}"
-        rangeName = f"Sheet1!B{startRow}:Z"
+        rangeName = f"{spreadsheetName}!B{startRow}:Z"
 
         value_input_option = "RAW" # ["RAW","USER_ENTERED"]
         print(f"About to writ data: {stockInfo}")
@@ -142,7 +144,7 @@ class GoogleSheets():
             'values': sheetData
         }
 
-        value_input_option = "USER_ENTERED" # ["RAW","USER_ENTERED"]
+        value_input_option = "RAW" # ["RAW","USER_ENTERED"]
         result = self.sheet.values().update(
             spreadsheetId=spreadsheetID, range=rangeName,
             valueInputOption=value_input_option, body=body).execute()

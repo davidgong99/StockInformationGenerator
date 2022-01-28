@@ -25,7 +25,7 @@ class StockInformation():
             lastRowInBatch = min(nextRow + threadLimit - 1, tickerCount)
             
             # Retrieve list of tickers
-            tickersList = self.gs.readRange(rangeName=f"A{nextRow}:A{lastRowInBatch}")
+            tickersList = self.gs.readRange(spreadsheetRange=f"!A{nextRow}:A{lastRowInBatch}")
             
             threads = list()
             
