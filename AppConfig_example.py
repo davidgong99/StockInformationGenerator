@@ -1,3 +1,4 @@
+from Column import Column
 
 def init():
     global config
@@ -11,7 +12,22 @@ def init():
         "spreadsheetName": "Sheet1",
         
         # Column names
-        "dataColumns": ["shortName","sector","marketCap","enterpriseToEbitda","lastDividendValue","trailingAnnualDividendYield","fiveYearAvgDividendYield","trailingAnnualDividendRate","lastDividendDate","exDividendDate","payoutRatio","lastSplitFactor","lastSplitDate","recommendationKey"],
+        "dataColumns": [
+            Column("shortName", "Short name"),
+            Column("sector", "Sector"),
+            Column("marketCap","Market Cap","millifyLarge"),
+            Column("enterpriseToEbitda","EV/EBITDA"),
+            Column("lastDividendValue","Last Dividend Value"),
+            Column("trailingAnnualDividendYield","Trailing Annual Dividend Yield", "millifyPercentage"),
+            Column("fiveYearAvgDividendYield",  "5Y Avg Dividend Yield"),
+            Column("trailingAnnualDividendRate","Trailing Annual Dividend Rate"),
+            Column("lastDividendDate",          "Last Dividend Date", "epochToDate"),
+            Column("exDividendDate",            "Ex-Dividend Date", "epochToDate"),
+            Column("payoutRatio",               "Payout Ratio", "millifyPercentage"),
+            Column("lastSplitFactor","Last Split Factor"),
+            Column("lastSplitDate","Last Split Date", "epochToDate"),
+            Column("recommendationKey","Recommendation Key"),
+        ],     
         
         # Starting row to process from
         "startRow": 101,

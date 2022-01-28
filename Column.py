@@ -11,8 +11,10 @@ class Column:
         try:
             if self.formatType == "test":
                 return f"{data}mmm"
-            elif self.formatType == "millify":
+            elif self.formatType == "millifyLarge":
                 return millify(data)
+            elif self.formatType == "millifyPercentage":
+                return f"{millify(data * 100, precision=2)}%"
             elif self.formatType == "epochToDate":
                 currDate = datetime.datetime.fromtimestamp(data)
                 
